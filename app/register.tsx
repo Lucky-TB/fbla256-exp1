@@ -11,7 +11,6 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -70,55 +69,55 @@ export default function RegisterScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-white">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
+        className="flex-1"
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.content}>
+          <View className="flex-1 px-6 py-8">
             {/* Back Button */}
             <TouchableOpacity
               onPress={() => router.back()}
-              style={styles.backButton}
+              className="mb-6 w-10"
             >
               <FontAwesome name="arrow-left" size={24} color="#2D2B2B" />
             </TouchableOpacity>
 
             {/* Title */}
-            <Text style={styles.title}>Hello! Register to get started</Text>
+            <Text className="text-[30px] font-bold text-[#2D2B2B] mb-6">Hello! Register to get started</Text>
 
             {/* Role Selection */}
-            <View style={styles.roleSection}>
-              <Text style={styles.roleLabel}>Select Your Role</Text>
-              <View style={styles.roleContainer}>
-                {roles.map((role) => (
+            <View className="mb-6">
+              <Text className="text-sm font-semibold text-[#2D2B2B] mb-3">Select Your Role</Text>
+              <View className="flex-row">
+                {roles.map((role, index) => (
                   <TouchableOpacity
                     key={role.value}
                     onPress={() => {
                       setSelectedRole(role.value);
                       setError('');
                     }}
-                    style={[
-                      styles.roleButton,
-                      selectedRole === role.value && styles.roleButtonSelected,
-                    ]}
+                    className={`flex-1 p-3 rounded-xl border-2 ${index > 0 ? 'ml-3' : ''} ${
+                      selectedRole === role.value
+                        ? 'border-[#0A2E7F] bg-[rgba(10,46,127,0.1)]'
+                        : 'border-[#E5E7EB] bg-white'
+                    }`}
                   >
-                    <View style={styles.roleButtonContent}>
+                    <View className="items-center">
                       <FontAwesome
                         name={role.icon as any}
                         size={20}
                         color={selectedRole === role.value ? '#0A2E7F' : '#9CA3AF'}
                       />
                       <Text
-                        style={[
-                          styles.roleButtonText,
-                          selectedRole === role.value && styles.roleButtonTextSelected,
-                        ]}
+                        className={`mt-2 text-xs font-semibold ${
+                          selectedRole === role.value ? 'text-[#0A2E7F]' : 'text-[#6B7280]'
+                        }`}
                       >
                         {role.label}
                       </Text>
@@ -129,9 +128,9 @@ export default function RegisterScreen() {
             </View>
 
             {/* Email Input */}
-            <View style={styles.inputContainer}>
+            <View className="mb-4">
               <TextInput
-                style={styles.input}
+                className="bg-[#F9FAFB] rounded-xl px-4 py-4 text-[#2D2B2B] text-base border border-[#E5E7EB]"
                 placeholder="Email"
                 placeholderTextColor="#9CA3AF"
                 value={email}
@@ -143,10 +142,10 @@ export default function RegisterScreen() {
             </View>
 
             {/* Password Input */}
-            <View style={styles.inputContainer}>
-              <View style={styles.passwordContainer}>
+            <View className="mb-4">
+              <View className="relative">
                 <TextInput
-                  style={styles.passwordInput}
+                  className="bg-[#F9FAFB] rounded-xl px-4 py-4 pr-12 text-[#2D2B2B] text-base border border-[#E5E7EB]"
                   placeholder="Password"
                   placeholderTextColor="#9CA3AF"
                   value={password}
@@ -156,7 +155,7 @@ export default function RegisterScreen() {
                 />
                 <TouchableOpacity
                   onPress={() => setShowPassword(!showPassword)}
-                  style={styles.eyeButton}
+                  className="absolute right-4 top-4"
                 >
                   <FontAwesome
                     name={showPassword ? 'eye-slash' : 'eye'}
@@ -168,10 +167,10 @@ export default function RegisterScreen() {
             </View>
 
             {/* Confirm Password Input */}
-            <View style={styles.inputContainer}>
-              <View style={styles.passwordContainer}>
+            <View className="mb-4">
+              <View className="relative">
                 <TextInput
-                  style={styles.passwordInput}
+                  className="bg-[#F9FAFB] rounded-xl px-4 py-4 pr-12 text-[#2D2B2B] text-base border border-[#E5E7EB]"
                   placeholder="Confirm password"
                   placeholderTextColor="#9CA3AF"
                   value={confirmPassword}
@@ -181,7 +180,7 @@ export default function RegisterScreen() {
                 />
                 <TouchableOpacity
                   onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                  style={styles.eyeButton}
+                  className="absolute right-4 top-4"
                 >
                   <FontAwesome
                     name={showConfirmPassword ? 'eye-slash' : 'eye'}
@@ -194,8 +193,8 @@ export default function RegisterScreen() {
 
             {/* Error Message */}
             {error ? (
-              <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
+              <View className="mb-4 p-3 bg-[#FEF2F2] rounded-xl border border-[#FECACA]">
+                <Text className="text-[#DC2626] text-sm text-center">{error}</Text>
               </View>
             ) : null}
 
@@ -203,21 +202,21 @@ export default function RegisterScreen() {
             <TouchableOpacity
               onPress={handleRegister}
               disabled={loading}
-              style={[styles.registerButton, loading && styles.registerButtonDisabled]}
+              className={`bg-[#0A2E7F] rounded-xl py-4 items-center mb-8 ${loading ? 'opacity-50' : ''}`}
             >
               {loading ? (
                 <ActivityIndicator color="white" />
               ) : (
-                <Text style={styles.registerButtonText}>Register</Text>
+                <Text className="text-white text-lg font-semibold">Register</Text>
               )}
             </TouchableOpacity>
 
             {/* Login Link */}
-            <View style={styles.loginLink}>
-              <Text style={styles.loginLinkText}>
+            <View className="items-center">
+              <Text className="text-[#6B7280] text-sm">
                 Already have an account?{' '}
                 <Text
-                  style={styles.loginLinkBold}
+                  className="text-[#1D52BC] font-semibold"
                   onPress={() => router.push('/login')}
                 >
                   Login Now
@@ -231,138 +230,3 @@ export default function RegisterScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingVertical: 32,
-  },
-  backButton: {
-    marginBottom: 24,
-    width: 40,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: '700',
-    color: '#2D2B2B',
-    marginBottom: 24,
-  },
-  roleSection: {
-    marginBottom: 24,
-  },
-  roleLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#2D2B2B',
-    marginBottom: 12,
-  },
-  roleContainer: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  roleButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#FFFFFF',
-  },
-  roleButtonSelected: {
-    borderColor: '#0A2E7F',
-    backgroundColor: 'rgba(10, 46, 127, 0.1)',
-  },
-  roleButtonContent: {
-    alignItems: 'center',
-  },
-  roleButtonText: {
-    marginTop: 8,
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#6B7280',
-  },
-  roleButtonTextSelected: {
-    color: '#0A2E7F',
-  },
-  inputContainer: {
-    marginBottom: 16,
-  },
-  input: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    color: '#2D2B2B',
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  passwordContainer: {
-    position: 'relative',
-  },
-  passwordInput: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    paddingRight: 48,
-    color: '#2D2B2B',
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  eyeButton: {
-    position: 'absolute',
-    right: 16,
-    top: 16,
-  },
-  errorContainer: {
-    marginBottom: 16,
-    padding: 12,
-    backgroundColor: '#FEF2F2',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#FECACA',
-  },
-  errorText: {
-    color: '#DC2626',
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  registerButton: {
-    backgroundColor: '#0A2E7F',
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  registerButtonDisabled: {
-    opacity: 0.5,
-  },
-  registerButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  loginLink: {
-    alignItems: 'center',
-  },
-  loginLinkText: {
-    color: '#6B7280',
-    fontSize: 14,
-  },
-  loginLinkBold: {
-    color: '#1D52BC',
-    fontWeight: '600',
-  },
-});

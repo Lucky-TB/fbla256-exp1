@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 
@@ -7,148 +7,52 @@ export default function AuthLandingScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="flex-1">
         {/* Top Section with Plants Illustration */}
-        <View style={styles.topSection}>
+        <View className="flex-1 bg-[#E8F4F8] justify-end items-center pb-8 px-8">
           {/* Plant illustrations */}
-          <View style={styles.plantsContainer}>
+          <View className="flex-row items-end justify-center mb-8">
             {/* Left plant - succulent */}
-            <View style={styles.plantWrapper}>
-              <View style={styles.succulentPot} />
-              <View style={styles.succulentBase} />
+            <View className="items-center mr-8">
+              <View className="w-20 h-[100px] bg-[#A8D5BA] rounded-t-[40px] mb-2" />
+              <View className="w-[70px] h-[70px] rounded-[35px] bg-[#B8E5C8]" />
             </View>
             {/* Right plant - snake plant */}
-            <View style={styles.plantWrapper}>
-              <View style={styles.snakePlantPot} />
-              <View style={styles.snakePlantBase} />
+            <View className="items-center">
+              <View className="w-[60px] h-[140px] bg-[#90C695] rounded-t-[30px] mb-2" />
+              <View className="w-[60px] h-[60px] rounded-[30px] bg-white" />
             </View>
           </View>
         </View>
 
         {/* Bottom Section with Buttons */}
-        <View style={styles.bottomSection}>
+        <View className="px-6 py-8 bg-white">
           {/* Login Button */}
           <TouchableOpacity
             onPress={() => router.push('/login')}
-            style={styles.loginButton}
+            className="bg-[#0A2E7F] rounded-xl py-4 items-center mb-4"
           >
-            <Text style={styles.loginButtonText}>Login</Text>
+            <Text className="text-white text-lg font-semibold">Login</Text>
           </TouchableOpacity>
 
           {/* Register Button */}
           <TouchableOpacity
             onPress={() => router.push('/register')}
-            style={styles.registerButton}
+            className="bg-white border-2 border-[#0A2E7F] rounded-xl py-4 items-center mb-4"
           >
-            <Text style={styles.registerButtonText}>Register</Text>
+            <Text className="text-[#0A2E7F] text-lg font-semibold">Register</Text>
           </TouchableOpacity>
 
           {/* Continue as Guest */}
           <TouchableOpacity
             onPress={() => router.push('/(tabs)/home')}
-            style={styles.guestButton}
+            className="items-center mt-2"
           >
-            <Text style={styles.guestButtonText}>Continue as a guest</Text>
+            <Text className="text-[#1D52BC] text-base font-medium">Continue as a guest</Text>
           </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  content: {
-    flex: 1,
-  },
-  topSection: {
-    flex: 1,
-    backgroundColor: '#E8F4F8',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    paddingBottom: 32,
-    paddingHorizontal: 32,
-  },
-  plantsContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-    marginBottom: 32,
-    gap: 32,
-  },
-  plantWrapper: {
-    alignItems: 'center',
-  },
-  succulentPot: {
-    width: 80,
-    height: 100,
-    backgroundColor: '#A8D5BA',
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
-    marginBottom: 8,
-  },
-  succulentBase: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: '#B8E5C8',
-  },
-  snakePlantPot: {
-    width: 60,
-    height: 140,
-    backgroundColor: '#90C695',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    marginBottom: 8,
-  },
-  snakePlantBase: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#FFFFFF',
-  },
-  bottomSection: {
-    paddingHorizontal: 24,
-    paddingVertical: 32,
-    backgroundColor: '#FFFFFF',
-  },
-  loginButton: {
-    backgroundColor: '#0A2E7F',
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  loginButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  registerButton: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 2,
-    borderColor: '#0A2E7F',
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  registerButtonText: {
-    color: '#0A2E7F',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  guestButton: {
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  guestButtonText: {
-    color: '#1D52BC',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-});
