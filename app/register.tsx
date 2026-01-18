@@ -60,7 +60,7 @@ export default function RegisterScreen() {
 
     try {
       await signUp(email, password, selectedRole);
-      router.replace('/(tabs)/home');
+      router.replace('/onboarding');
     } catch (err: any) {
       setError(err.message || 'Registration failed');
     } finally {
