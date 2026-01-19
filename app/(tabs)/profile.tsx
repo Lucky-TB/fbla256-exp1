@@ -54,6 +54,7 @@
  * when preferences are changed, reinforcing personalization and engagement.
  */
 
+import { useAccessibility } from '@/contexts/AccessibilityContext';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   getUserProfileWithPreferences,
@@ -93,17 +94,19 @@ interface ListItemProps {
 }
 
 function ListItem({ icon, label, onPress, rightElement, showChevron = true, badge }: ListItemProps) {
+  const { colors, textSizeMultiplier } = useAccessibility();
+  
   const content = (
-    <View style={styles.listItem}>
+    <View style={[styles.listItem, { borderBottomColor: colors.border }]}>
       <View style={styles.listItemContent}>
         <View style={styles.iconContainer}>
           <FontAwesome 
             name={icon as any} 
             size={20} 
-            color="#000000"
+            color={colors.text}
           />
         </View>
-        <Text style={styles.listItemText}>{label}</Text>
+        <Text style={[styles.listItemText, { color: colors.text, fontSize: 16 * textSizeMultiplier }]}>{label}</Text>
         {badge && (
           <View style={styles.badge}>
             <Text style={styles.badgeText}>{badge}</Text>
@@ -128,6 +131,7 @@ function ListItem({ icon, label, onPress, rightElement, showChevron = true, badg
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
   const router = useRouter();
+  const { colors, textSizeMultiplier } = useAccessibility();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -226,12 +230,27 @@ export default function ProfileScreen() {
     );
   };
 
+  // Create dynamic styles based on accessibility settings
+  const dynamicStyles = {
+    container: { ...styles.container, backgroundColor: colors.background },
+    header: { ...styles.header, backgroundColor: colors.background },
+    headerTitle: { ...styles.headerTitle, color: colors.text, fontSize: 34 * textSizeMultiplier },
+    loadingText: { ...styles.loadingText, color: colors.textSecondary, fontSize: 16 * textSizeMultiplier },
+    profileCard: { ...styles.profileCard, backgroundColor: colors.cardBackground },
+    profileName: { ...styles.profileName, color: colors.text, fontSize: 20 * textSizeMultiplier },
+    profileSubtext: { ...styles.profileSubtext, color: colors.text, fontSize: 15 * textSizeMultiplier },
+    sectionTitle: { ...styles.sectionTitle, color: colors.text, fontSize: 17 * textSizeMultiplier },
+    listItem: { ...styles.listItem, borderBottomColor: colors.border },
+    listItemText: { ...styles.listItemText, color: colors.text, fontSize: 16 * textSizeMultiplier },
+    listValue: { ...styles.listValue, color: colors.textSecondary, fontSize: 16 * textSizeMultiplier },
+  };
+
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={dynamicStyles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#000000" />
-          <Text style={styles.loadingText}>Loading profile...</Text>
+          <ActivityIndicator size="large" color={colors.text} />
+          <Text style={dynamicStyles.loadingText}>Loading profile...</Text>
         </View>
       </SafeAreaView>
     );
@@ -264,10 +283,10 @@ export default function ProfileScreen() {
   const initials = getInitials(displayFirstName || profile?.firstName, displayLastName || profile?.lastName);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={dynamicStyles.container} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Profile</Text>
+      <View style={dynamicStyles.header}>
+        <Text style={dynamicStyles.headerTitle}>Profile</Text>
         <View style={styles.headerRight}>
           <TouchableOpacity style={styles.headerIcon}>
             <FontAwesome name="bell" size={22} color="#000000" />
@@ -285,15 +304,15 @@ export default function ProfileScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Profile Card */}
-        <View style={styles.profileCard}>
+        <View style={dynamicStyles.profileCard}>
           <View style={styles.profileTop}>
             <View style={styles.avatar}>
               <Text style={styles.avatarText}>{initials}</Text>
             </View>
             <View style={styles.profileText}>
-              <Text style={styles.profileName}>{fullName}</Text>
+              <Text style={dynamicStyles.profileName}>{fullName}</Text>
               {user?.email && (
-                <Text style={styles.profileSubtext}>{user.email}</Text>
+                <Text style={dynamicStyles.profileSubtext}>{user.email}</Text>
               )}
             </View>
           </View>
@@ -301,7 +320,7 @@ export default function ProfileScreen() {
 
         {/* Member Information Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Member Information</Text>
+          <Text style={dynamicStyles.sectionTitle}>Member Information</Text>
           <View style={styles.listGroup}>
             <ListItem
               icon="user"
@@ -313,7 +332,7 @@ export default function ProfileScreen() {
 
         {/* Preferences Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Preferences</Text>
+          <Text style={dynamicStyles.sectionTitle}>Preferences</Text>
           <View style={styles.listGroup}>
             <ListItem
               icon="bell"
@@ -344,7 +363,7 @@ export default function ProfileScreen() {
 
         {/* Account Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account</Text>
+          <Text style={dynamicStyles.sectionTitle}>Account</Text>
           <View style={styles.listGroup}>
             <ListItem
               icon="lock"
@@ -368,7 +387,7 @@ export default function ProfileScreen() {
 
         {/* Help Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Help</Text>
+          <Text style={dynamicStyles.sectionTitle}>Help</Text>
           <View style={styles.listGroup}>
             <ListItem
               icon="question-circle"

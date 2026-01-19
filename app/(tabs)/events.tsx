@@ -76,6 +76,7 @@
  *    - Handles offline scenarios gracefully
  */
 
+import { useAccessibility } from '@/contexts/AccessibilityContext';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   EventCategory,
@@ -104,6 +105,7 @@ type ViewMode = 'all' | 'my';
 export default function EventsScreen() {
   const { user } = useAuth();
   const router = useRouter();
+  const { colors, textSizeMultiplier } = useAccessibility();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('all');
@@ -230,19 +232,19 @@ export default function EventsScreen() {
     const isAdded = 'isAddedToMyEvents' in event ? event.isAddedToMyEvents : false;
     const category = event.eventCategory;
     const icon = getEventCategoryIcon(category);
-    const color = getEventCategoryColor(category);
+    const categoryColor = getEventCategoryColor(category);
 
     return (
       <TouchableOpacity
         key={event.id}
-        style={styles.eventCard}
+        style={dynamicStyles.eventCard}
         onPress={() => router.push(`/event-detail?id=${event.id}`)}
         activeOpacity={0.7}
       >
         <View style={styles.eventHeader}>
-          <View style={[styles.eventTypeBadge, { backgroundColor: `${color}15` }]}>
-            <FontAwesome name={icon as any} size={14} color={color} />
-            <Text style={[styles.eventTypeText, { color }]}>
+          <View style={[styles.eventTypeBadge, { backgroundColor: `${categoryColor}15` }]}>
+            <FontAwesome name={icon as any} size={14} color={categoryColor} />
+            <Text style={[styles.eventTypeText, { color: categoryColor, fontSize: 12 * textSizeMultiplier }]}>
               {formatEventCategory(category)}
             </Text>
           </View>
@@ -260,12 +262,12 @@ export default function EventsScreen() {
           </View>
         )}
 
-        <Text style={styles.eventName}>{event.name}</Text>
+        <Text style={dynamicStyles.eventName}>{event.name}</Text>
 
         <View style={styles.eventDetails}>
           <View style={styles.eventDetailRow}>
-            <FontAwesome name="calendar" size={14} color="#6B7280" />
-            <Text style={styles.eventDetailText}>
+            <FontAwesome name="calendar" size={14} color={colors.textSecondary} />
+            <Text style={dynamicStyles.eventDetailText}>
               {formatDate(event.startDate)}
               {event.endDate && ` - ${formatDate(event.endDate)}`}
             </Text>
@@ -273,8 +275,8 @@ export default function EventsScreen() {
 
           {event.location && (
             <View style={styles.eventDetailRow}>
-              <FontAwesome name="map-marker" size={14} color="#6B7280" />
-              <Text style={styles.eventDetailText}>
+              <FontAwesome name="map-marker" size={14} color={colors.textSecondary} />
+              <Text style={dynamicStyles.eventDetailText}>
                 {event.location}
                 {event.locationType === 'virtual' && ' (Virtual)'}
                 {event.locationType === 'hybrid' && ' (Hybrid)'}
@@ -285,7 +287,7 @@ export default function EventsScreen() {
           {event.registrationDeadline && (
             <View style={styles.eventDetailRow}>
               <FontAwesome name="clock-o" size={14} color="#EF4444" />
-              <Text style={[styles.eventDetailText, styles.deadlineText]}>
+              <Text style={[dynamicStyles.eventDetailText, styles.deadlineText]}>
                 Registration: {formatDate(event.registrationDeadline)}
               </Text>
             </View>
@@ -293,7 +295,7 @@ export default function EventsScreen() {
         </View>
 
         {event.description && (
-          <Text style={styles.eventDescription} numberOfLines={2}>
+          <Text style={dynamicStyles.eventDescription} numberOfLines={2}>
             {event.description}
           </Text>
         )}
@@ -301,12 +303,30 @@ export default function EventsScreen() {
     );
   };
 
+  // Create dynamic styles based on accessibility settings
+  const dynamicStyles = {
+    container: { ...styles.container, backgroundColor: colors.background },
+    header: { ...styles.header, backgroundColor: colors.background },
+    headerTitle: { ...styles.headerTitle, color: colors.text, fontSize: 34 * textSizeMultiplier },
+    loadingText: { ...styles.loadingText, color: colors.textSecondary, fontSize: 16 * textSizeMultiplier },
+    tabText: { ...styles.tabText, fontSize: 15 * textSizeMultiplier },
+    filterSectionTitle: { ...styles.filterSectionTitle, color: colors.textSecondary, fontSize: 14 * textSizeMultiplier },
+    filterChipText: { ...styles.filterChipText, fontSize: 14 * textSizeMultiplier },
+    eventName: { ...styles.eventName, color: colors.text, fontSize: 18 * textSizeMultiplier },
+    eventDetailText: { ...styles.eventDetailText, color: colors.textSecondary, fontSize: 14 * textSizeMultiplier },
+    eventDescription: { ...styles.eventDescription, color: colors.textSecondary, fontSize: 14 * textSizeMultiplier },
+    emptyStateTitle: { ...styles.emptyStateTitle, color: colors.text, fontSize: 20 * textSizeMultiplier },
+    emptyStateText: { ...styles.emptyStateText, color: colors.textSecondary, fontSize: 15 * textSizeMultiplier },
+    eventCard: { ...styles.eventCard, backgroundColor: colors.cardBackground },
+    filterSection: { ...styles.filterSection, backgroundColor: colors.background, borderBottomColor: colors.border },
+  };
+
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={dynamicStyles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#000000" />
-          <Text style={styles.loadingText}>Loading events...</Text>
+          <ActivityIndicator size="large" color={colors.text} />
+          <Text style={dynamicStyles.loadingText}>Loading events...</Text>
         </View>
       </SafeAreaView>
     );
@@ -316,10 +336,10 @@ export default function EventsScreen() {
   const hasEvents = displayEvents.length > 0;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={dynamicStyles.container} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Events</Text>
+      <View style={dynamicStyles.header}>
+        <Text style={dynamicStyles.headerTitle}>Events</Text>
       </View>
 
       {/* View Mode Tabs */}
@@ -346,8 +366,8 @@ export default function EventsScreen() {
       {viewMode === 'all' && (
         <>
           {/* Event Category Filter */}
-          <View style={styles.filterSection}>
-            <Text style={styles.filterSectionTitle}>Event Category</Text>
+          <View style={dynamicStyles.filterSection}>
+            <Text style={dynamicStyles.filterSectionTitle}>Event Category</Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -378,8 +398,8 @@ export default function EventsScreen() {
           </View>
 
           {/* Event Division Filter */}
-          <View style={styles.filterSection}>
-            <Text style={styles.filterSectionTitle}>Event Divisions</Text>
+          <View style={dynamicStyles.filterSection}>
+            <Text style={dynamicStyles.filterSectionTitle}>Event Divisions</Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -422,11 +442,11 @@ export default function EventsScreen() {
           </View>
         ) : (
           <View style={styles.emptyState}>
-            <FontAwesome name="calendar-o" size={48} color="#D1D5DB" />
-            <Text style={styles.emptyStateTitle}>
+            <FontAwesome name="calendar-o" size={48} color={colors.textSecondary} />
+            <Text style={dynamicStyles.emptyStateTitle}>
               {viewMode === 'all' ? 'No events found' : 'No events in your schedule'}
             </Text>
-            <Text style={styles.emptyStateText}>
+            <Text style={dynamicStyles.emptyStateText}>
               {viewMode === 'all'
                 ? 'Check back later for upcoming FBLA events'
                 : 'Add events to your schedule to see them here'}

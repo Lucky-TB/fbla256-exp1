@@ -12,94 +12,43 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRouter } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
-import {
-  getUserProfileWithPreferences,
-  updateUserPreferences,
-  UserPreferences,
-} from '@/utils/userProfile';
+import { useAccessibility } from '@/contexts/AccessibilityContext';
 
 export default function AccessibilitySettingsScreen() {
-  const { user } = useAuth();
   const router = useRouter();
+  const { textSize, highContrast, updateTextSize, updateHighContrast, colors, textSizeMultiplier, loading: accessibilityLoading } = useAccessibility();
   const [loading, setLoading] = useState(true);
-  const [preferences, setPreferences] = useState<UserPreferences | null>(null);
 
   useEffect(() => {
-    const loadPreferences = async () => {
-      if (!user?.id) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const data = await getUserProfileWithPreferences(user.id);
-        if (data) {
-          setPreferences(data.preferences);
-        } else {
-          // Default preferences
-          setPreferences({
-            notifications: {
-              events: true,
-              competitions: true,
-              announcements: true,
-            },
-            accessibility: {
-              textSize: 'medium',
-              highContrast: false,
-            },
-          });
-        }
-      } catch (error) {
-        console.error('Error loading preferences:', error);
-        setPreferences({
-          notifications: {
-            events: true,
-            competitions: true,
-            announcements: true,
-          },
-          accessibility: {
-            textSize: 'medium',
-            highContrast: false,
-          },
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPreferences();
-  }, [user?.id]);
-
-  const updateAccessibilityPreference = async (
-    field: 'textSize' | 'highContrast',
-    value: 'small' | 'medium' | 'large' | boolean
-  ) => {
-    if (!user?.id || !preferences) return;
-
-    try {
-      const updatedPreferences: UserPreferences = {
-        ...preferences,
-        accessibility: {
-          ...preferences.accessibility,
-          [field]: value,
-        },
-      };
-
-      await updateUserPreferences(user.id, updatedPreferences);
-      setPreferences(updatedPreferences);
-    } catch (error) {
-      console.error('Error updating accessibility preference:', error);
-      Alert.alert('Error', 'Failed to update accessibility setting');
+    // Wait for accessibility context to load
+    if (!accessibilityLoading) {
+      setLoading(false);
     }
+  }, [accessibilityLoading]);
+
+  // Create dynamic styles based on accessibility settings
+  const dynamicStyles = {
+    container: { ...styles.container, backgroundColor: colors.background },
+    header: { ...styles.header, backgroundColor: colors.background },
+    headerTitle: { ...styles.headerTitle, color: colors.text, fontSize: 34 * textSizeMultiplier },
+    loadingText: { ...styles.loadingText, color: colors.textSecondary, fontSize: 16 * textSizeMultiplier },
+    sectionTitle: { ...styles.sectionTitle, color: colors.text, fontSize: 20 * textSizeMultiplier },
+    sectionDescription: { ...styles.sectionDescription, color: colors.textSecondary, fontSize: 15 * textSizeMultiplier },
+    optionText: { ...styles.optionText, color: colors.text, fontSize: 16 * textSizeMultiplier },
+    settingTitle: { ...styles.settingTitle, color: colors.text, fontSize: 16 * textSizeMultiplier },
+    settingDescription: { ...styles.settingDescription, color: colors.textSecondary, fontSize: 14 * textSizeMultiplier },
+    settingRow: { ...styles.settingRow, backgroundColor: colors.cardBackground, borderColor: colors.border },
+    optionButton: { ...styles.optionButton, backgroundColor: colors.cardBackground, borderColor: colors.border },
+    infoText: { ...styles.infoText, color: colors.textSecondary, fontSize: 14 * textSizeMultiplier },
+    infoBox: { ...styles.infoBox, backgroundColor: highContrast ? colors.cardBackground : '#F3F4F6' },
   };
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={dynamicStyles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#000000" />
-          <Text style={styles.loadingText}>Loading...</Text>
+          <ActivityIndicator size="large" color={colors.text} />
+          <Text style={dynamicStyles.loadingText}>Loading...</Text>
         </View>
       </SafeAreaView>
     );
@@ -112,13 +61,13 @@ export default function AccessibilitySettingsScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={dynamicStyles.container} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={dynamicStyles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <FontAwesome name="chevron-left" size={20} color="#000000" />
+          <FontAwesome name="chevron-left" size={20} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Accessibility</Text>
+        <Text style={dynamicStyles.headerTitle}>Accessibility</Text>
         <View style={styles.headerRight} />
       </View>
 
@@ -130,8 +79,8 @@ export default function AccessibilitySettingsScreen() {
         <View style={styles.content}>
           {/* Text Size Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Text Size</Text>
-            <Text style={styles.sectionDescription}>
+            <Text style={dynamicStyles.sectionTitle}>Text Size</Text>
+            <Text style={dynamicStyles.sectionDescription}>
               Adjust the text size to make content easier to read.
             </Text>
             <View style={styles.optionsContainer}>
@@ -139,20 +88,20 @@ export default function AccessibilitySettingsScreen() {
                 <TouchableOpacity
                   key={size.value}
                   style={[
-                    styles.optionButton,
-                    preferences?.accessibility.textSize === size.value && styles.optionButtonActive,
+                    dynamicStyles.optionButton,
+                    textSize === size.value && styles.optionButtonActive,
                   ]}
-                  onPress={() => updateAccessibilityPreference('textSize', size.value)}
+                  onPress={() => updateTextSize(size.value)}
                 >
                   <Text
                     style={[
-                      styles.optionText,
-                      preferences?.accessibility.textSize === size.value && styles.optionTextActive,
+                      dynamicStyles.optionText,
+                      textSize === size.value && styles.optionTextActive,
                     ]}
                   >
                     {size.label}
                   </Text>
-                  {preferences?.accessibility.textSize === size.value && (
+                  {textSize === size.value && (
                     <FontAwesome name="check" size={16} color="#0A2E7F" style={styles.checkIcon} />
                   )}
                 </TouchableOpacity>
@@ -162,26 +111,26 @@ export default function AccessibilitySettingsScreen() {
 
           {/* High Contrast Section */}
           <View style={styles.section}>
-            <View style={styles.settingRow}>
+            <View style={dynamicStyles.settingRow}>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>High Contrast</Text>
-                <Text style={styles.settingDescription}>
+                <Text style={dynamicStyles.settingTitle}>High Contrast</Text>
+                <Text style={dynamicStyles.settingDescription}>
                   Increase contrast for better visibility
                 </Text>
               </View>
               <Switch
-                value={preferences?.accessibility.highContrast || false}
-                onValueChange={(value) => updateAccessibilityPreference('highContrast', value)}
-                trackColor={{ false: '#E5E7EB', true: '#0A2E7F' }}
+                value={highContrast}
+                onValueChange={updateHighContrast}
+                trackColor={{ false: colors.border, true: '#0A2E7F' }}
                 thumbColor="#fff"
               />
             </View>
           </View>
 
           {/* Info Note */}
-          <View style={styles.infoBox}>
-            <FontAwesome name="info-circle" size={16} color="#6B7280" />
-            <Text style={styles.infoText}>
+          <View style={dynamicStyles.infoBox}>
+            <FontAwesome name="info-circle" size={16} color={colors.textSecondary} />
+            <Text style={dynamicStyles.infoText}>
               These settings will be applied throughout the app to improve readability and
               accessibility.
             </Text>
