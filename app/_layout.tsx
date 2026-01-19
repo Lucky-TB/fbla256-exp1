@@ -77,6 +77,7 @@ function RootLayoutNav() {
             <Stack.Screen name="chapter-social-media" options={{ headerShown: false }} />
             <Stack.Screen name="edit-profile" options={{ headerShown: false }} />
             <Stack.Screen name="create-announcement" options={{ headerShown: false }} />
+            <Stack.Screen name="announcement-detail" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
           </Stack>

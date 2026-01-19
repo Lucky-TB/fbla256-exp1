@@ -39,10 +39,11 @@ export interface SupabaseAnnouncement {
  */
 export async function getChapterAnnouncements(userChapter: string): Promise<Announcement[]> {
   try {
+    // RLS policy handles chapter filtering, so we don't need to filter by chapter_name here
+    // The RLS policy will automatically filter to only show announcements for the user's chapter
     const { data, error } = await supabase
       .from('announcements')
       .select('*')
-      .eq('chapter_name', userChapter)
       .eq('is_active', true)
       .order('created_at', { ascending: false });
 
@@ -53,10 +54,23 @@ export async function getChapterAnnouncements(userChapter: string): Promise<Anno
         return [];
       }
       console.error('Error fetching announcements:', error);
+      console.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      });
       return [];
     }
 
     if (!data) return [];
+    
+    // Log for debugging (remove in production)
+    console.log('Fetched announcements:', {
+      count: data.length,
+      userChapter,
+      announcementChapters: data.map((a: any) => a.chapter_name),
+    });
 
     // Transform Supabase format to app format
     return data.map((announcement: SupabaseAnnouncement) => ({
@@ -125,25 +139,75 @@ export async function createAnnouncement(
 }
 
 /**
+ * Delete an announcement
+ * 
+ * Security: 
+ * - Teachers can delete announcements from their chapter
+ * - Admins can delete any announcement
+ * - RLS policy enforces this at the database level
+ */
+export async function deleteAnnouncement(announcementId: string): Promise<void> {
+  try {
+    const { error } = await supabase
+      .from('announcements')
+      .delete()
+      .eq('id', announcementId);
+
+    if (error) {
+      console.error('Error deleting announcement:', error);
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error deleting announcement:', error);
+    throw error;
+  }
+}
+
+/**
+ * Check if user can delete an announcement
+ * - Teachers can delete announcements from their chapter
+ * - Admins can delete any announcement
+ */
+export async function canDeleteAnnouncement(
+  announcement: Announcement,
+  userRole: 'student' | 'teacher' | 'admin' | null,
+  userChapter: string
+): Promise<boolean> {
+  // Admins can delete any announcement
+  if (userRole === 'admin') {
+    return true;
+  }
+
+  // Teachers can delete announcements from their chapter
+  if (userRole === 'teacher') {
+    return announcement.chapterName.toLowerCase() === userChapter.toLowerCase();
+  }
+
+  // Students cannot delete announcements
+  return false;
+}
+
+/**
  * Format announcement timestamp for display
+ * Shows date and time in 12-hour format with AM/PM
  */
 export function formatAnnouncementDate(dateString: string): string {
   const date = new Date(dateString);
   const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'} ago`;
-  if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? 'hour' : 'hours'} ago`;
-  if (diffDays < 7) return `${diffDays} ${diffDays === 1 ? 'day' : 'days'} ago`;
-
-  // For older announcements, show formatted date
-  return date.toLocaleDateString('en-US', {
+  
+  // Format date
+  const dateStr = date.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
   });
+  
+  // Format time in 12-hour format with AM/PM
+  const timeStr = date.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
+  
+  return `${dateStr} at ${timeStr}`;
 }

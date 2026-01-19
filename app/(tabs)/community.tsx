@@ -122,6 +122,35 @@ export default function CommunityScreen() {
     socialMedia.facebook
   );
 
+  // Create dynamic styles based on accessibility settings
+  const dynamicStyles = {
+    announcementCard: {
+      backgroundColor: colors.cardBackground,
+      borderRadius: 12,
+      padding: 16,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 3,
+      elevation: 2,
+      marginBottom: 16,
+    },
+    announcementTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      fontFamily: 'ApercuPro-Bold',
+      color: colors.text,
+      marginTop: 0,
+      marginBottom: 8,
+    },
+    announcementBody: {
+      fontSize: 14,
+      fontFamily: 'ApercuPro-Regular',
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+  };
+
   // Handle social media platform opening
   const handleOpenSocialMedia = async (platform: 'instagram' | 'twitter' | 'tiktok' | 'facebook') => {
     if (!socialMedia) return;
@@ -140,6 +169,7 @@ export default function CommunityScreen() {
         break;
       case 'twitter':
         if (!socialMedia.twitter) return;
+        // Use desktop version to prevent automatic redirects
         webUrl = `https://x.com/${socialMedia.twitter}`;
         deepLink = `twitter://user?screen_name=${socialMedia.twitter}`;
         title = 'X (Twitter)';
@@ -200,18 +230,27 @@ export default function CommunityScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View className="px-6 pt-6 pb-4">
-          <View className="flex-row items-center justify-between mb-2">
-            <View className="flex-1">
+        <View style={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 16 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <View style={{ flex: 1 }}>
               <Text
-                className="text-[#2D2B2B] text-3xl font-bold mb-2"
-                style={{ fontSize: 30 * textSizeMultiplier }}
+                style={{
+                  fontSize: 34 * textSizeMultiplier,
+                  fontWeight: '700',
+                  fontFamily: 'ApercuPro-Bold',
+                  color: colors.text,
+                  marginBottom: 8,
+                  letterSpacing: -0.5,
+                }}
               >
                 Community
               </Text>
               <Text
-                className="text-[#6B7280] text-base"
-                style={{ fontSize: 16 * textSizeMultiplier }}
+                style={{
+                  fontSize: 16 * textSizeMultiplier,
+                  fontFamily: 'ApercuPro-Regular',
+                  color: colors.textSecondary,
+                }}
               >
                 Stay connected with your chapter
               </Text>
@@ -220,7 +259,15 @@ export default function CommunityScreen() {
             {(role === 'teacher' || role === 'admin') && (
               <TouchableOpacity
                 onPress={() => router.push('/create-announcement')}
-                className="bg-[#0A2E7F] px-4 py-2 rounded-xl items-center justify-center ml-4"
+                style={{
+                  backgroundColor: '#0A2E7F',
+                  paddingHorizontal: 16,
+                  paddingVertical: 8,
+                  borderRadius: 12,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginLeft: 16,
+                }}
               >
                 <FontAwesome name="plus" size={18} color="white" />
               </TouchableOpacity>
@@ -229,67 +276,82 @@ export default function CommunityScreen() {
         </View>
 
         {/* Announcements Section */}
-        <View className="px-6 mb-6">
+        <View style={{ paddingHorizontal: 20, marginBottom: 24 }}>
           <Text
-            className="text-[#2D2B2B] text-xl font-bold mb-4"
-            style={{ fontSize: 20 * textSizeMultiplier }}
+            style={{
+              fontSize: 20 * textSizeMultiplier,
+              fontWeight: '700',
+              fontFamily: 'ApercuPro-Bold',
+              color: colors.text,
+              marginBottom: 16,
+            }}
           >
             Announcements
           </Text>
 
           {announcements.length === 0 ? (
-            <View className="bg-[#F9FAFB] rounded-xl p-6 items-center">
+            <View style={{
+              backgroundColor: '#F9FAFB',
+              borderRadius: 12,
+              padding: 24,
+              alignItems: 'center',
+            }}>
               <FontAwesome name="bullhorn" size={48} color="#9CA3AF" />
               <Text
-                className="text-[#6B7280] text-center mt-4"
-                style={{ fontSize: 16 * textSizeMultiplier }}
+                style={{
+                  fontSize: 16 * textSizeMultiplier,
+                  fontFamily: 'ApercuPro-Regular',
+                  color: colors.textSecondary,
+                  textAlign: 'center',
+                  marginTop: 16,
+                }}
               >
                 No announcements yet
               </Text>
               <Text
-                className="text-[#9CA3AF] text-center mt-2 text-sm"
-                style={{ fontSize: 14 * textSizeMultiplier }}
+                style={{
+                  fontSize: 14 * textSizeMultiplier,
+                  fontFamily: 'ApercuPro-Regular',
+                  color: '#9CA3AF',
+                  textAlign: 'center',
+                  marginTop: 8,
+                }}
               >
                 Check back later for chapter updates and news
               </Text>
             </View>
           ) : (
-            <View>
-              {announcements.map((announcement, index) => (
-                <View
+            <View style={styles.announcementsList}>
+              {announcements.map((announcement) => (
+                <TouchableOpacity
                   key={announcement.id}
-                  className="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-sm mb-4"
-                  style={index === announcements.length - 1 ? { marginBottom: 0 } : undefined}
+                  style={[dynamicStyles.announcementCard, { backgroundColor: colors.cardBackground }]}
+                  onPress={() => router.push(`/announcement-detail?id=${announcement.id}`)}
+                  activeOpacity={0.7}
                 >
-                  <View className="flex-row items-start justify-between mb-2">
-                    <Text
-                      className="text-[#2D2B2B] text-lg font-semibold flex-1"
-                      style={{ fontSize: 18 * textSizeMultiplier }}
-                    >
-                      {announcement.title}
-                    </Text>
-                    <Text
-                      className="text-[#9CA3AF] text-xs ml-2"
-                      style={{ fontSize: 12 * textSizeMultiplier }}
-                    >
+                  <View style={styles.announcementHeader}>
+                    {announcement.postedByRole && (
+                      <View style={[styles.announcementBadge, { backgroundColor: `${'#0A2E7F'}15` }]}>
+                        <FontAwesome name="user" size={12} color="#0A2E7F" />
+                        <Text style={[styles.announcementBadgeText, { color: '#0A2E7F', fontSize: 12 * textSizeMultiplier }]}>
+                          {announcement.postedByRole}
+                        </Text>
+                      </View>
+                    )}
+                    <Text style={[styles.announcementDate, { color: colors.textSecondary, fontSize: 12 * textSizeMultiplier }]}>
                       {formatAnnouncementDate(announcement.createdAt)}
                     </Text>
                   </View>
-                  {announcement.postedByRole && (
-                    <Text
-                      className="text-[#6B7280] text-sm mb-2"
-                      style={{ fontSize: 14 * textSizeMultiplier }}
-                    >
-                      Posted by {announcement.postedByRole}
-                    </Text>
-                  )}
+                  <Text style={[dynamicStyles.announcementTitle, { color: colors.text, fontSize: 18 * textSizeMultiplier }]}>
+                    {announcement.title}
+                  </Text>
                   <Text
-                    className="text-[#4B5563] text-base leading-6"
-                    style={{ fontSize: 16 * textSizeMultiplier }}
+                    style={[dynamicStyles.announcementBody, { color: colors.textSecondary, fontSize: 14 * textSizeMultiplier }]}
+                    numberOfLines={3}
                   >
                     {announcement.body}
                   </Text>
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           )}
@@ -298,27 +360,37 @@ export default function CommunityScreen() {
         {/* Social Media Section - Only show if handles exist */}
         {hasSocialMedia && (
           <>
-            <View className="px-6 mb-4">
-              <View className="h-px bg-[#E5E7EB]" />
+            <View style={{ paddingHorizontal: 20, marginBottom: 16 }}>
+              <View style={{ height: 1, backgroundColor: '#E5E7EB' }} />
             </View>
 
-            <View className="px-6 mb-6">
+            <View style={{ paddingHorizontal: 20, marginBottom: 24 }}>
               <Text
-                className="text-[#2D2B2B] text-xl font-bold mb-4"
-                style={{ fontSize: 20 * textSizeMultiplier }}
+                style={{
+                  fontSize: 20 * textSizeMultiplier,
+                  fontWeight: '700',
+                  fontFamily: 'ApercuPro-Bold',
+                  color: colors.text,
+                  marginBottom: 16,
+                }}
               >
                 Follow Our Chapter
               </Text>
 
-              <View className="flex-row flex-wrap" style={{ gap: 12 }}>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
                 {socialMedia.instagram && (
                   <TouchableOpacity
                     onPress={() => handleOpenSocialMedia('instagram')}
-                    className="rounded-xl p-4 items-center"
                     style={[styles.socialButton, { backgroundColor: '#E4405F' }]}
                   >
                     <FontAwesome name="instagram" size={32} color="white" />
-                    <Text className="text-white font-semibold mt-2" style={{ fontSize: 14 * textSizeMultiplier }}>
+                    <Text style={{
+                      color: 'white',
+                      fontWeight: '600',
+                      fontFamily: 'ApercuPro-Medium',
+                      marginTop: 8,
+                      fontSize: 14 * textSizeMultiplier,
+                    }}>
                       Instagram
                     </Text>
                   </TouchableOpacity>
@@ -327,11 +399,16 @@ export default function CommunityScreen() {
                 {socialMedia.twitter && (
                   <TouchableOpacity
                     onPress={() => handleOpenSocialMedia('twitter')}
-                    className="rounded-xl p-4 items-center"
                     style={[styles.socialButton, { backgroundColor: '#000000' }]}
                   >
                     <FontAwesome name="twitter" size={32} color="white" />
-                    <Text className="text-white font-semibold mt-2" style={{ fontSize: 14 * textSizeMultiplier }}>
+                    <Text style={{
+                      color: 'white',
+                      fontWeight: '600',
+                      fontFamily: 'ApercuPro-Medium',
+                      marginTop: 8,
+                      fontSize: 14 * textSizeMultiplier,
+                    }}>
                       X (Twitter)
                     </Text>
                   </TouchableOpacity>
@@ -340,11 +417,16 @@ export default function CommunityScreen() {
                 {socialMedia.tiktok && (
                   <TouchableOpacity
                     onPress={() => handleOpenSocialMedia('tiktok')}
-                    className="rounded-xl p-4 items-center"
                     style={[styles.socialButton, { backgroundColor: '#000000' }]}
                   >
                     <FontAwesome name="music" size={32} color="white" />
-                    <Text className="text-white font-semibold mt-2" style={{ fontSize: 14 * textSizeMultiplier }}>
+                    <Text style={{
+                      color: 'white',
+                      fontWeight: '600',
+                      fontFamily: 'ApercuPro-Medium',
+                      marginTop: 8,
+                      fontSize: 14 * textSizeMultiplier,
+                    }}>
                       TikTok
                     </Text>
                   </TouchableOpacity>
@@ -353,11 +435,16 @@ export default function CommunityScreen() {
                 {socialMedia.facebook && (
                   <TouchableOpacity
                     onPress={() => handleOpenSocialMedia('facebook')}
-                    className="rounded-xl p-4 items-center"
                     style={[styles.socialButton, { backgroundColor: '#1877F2' }]}
                   >
                     <FontAwesome name="facebook" size={32} color="white" />
-                    <Text className="text-white font-semibold mt-2" style={{ fontSize: 14 * textSizeMultiplier }}>
+                    <Text style={{
+                      color: 'white',
+                      fontWeight: '600',
+                      fontFamily: 'ApercuPro-Medium',
+                      marginTop: 8,
+                      fontSize: 14 * textSizeMultiplier,
+                    }}>
                       Facebook
                     </Text>
                   </TouchableOpacity>
@@ -368,7 +455,7 @@ export default function CommunityScreen() {
         )}
 
         {/* Bottom padding */}
-        <View className="h-6" />
+        <View style={{ height: 24 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -378,5 +465,57 @@ const styles = StyleSheet.create({
   socialButton: {
     minWidth: 140,
     width: '48%',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  announcementsList: {
+    gap: 16,
+  },
+  announcementCard: {
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  announcementHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  announcementBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 6,
+  },
+  announcementBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    fontFamily: 'ApercuPro-Medium',
+  },
+  announcementDate: {
+    fontSize: 12,
+    fontFamily: 'ApercuPro-Regular',
+  },
+  announcementTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    fontFamily: 'ApercuPro-Bold',
+    color: '#000000',
+    marginBottom: 8,
+  },
+  announcementBody: {
+    fontSize: 14,
+    fontFamily: 'ApercuPro-Regular',
+    color: '#6B7280',
+    lineHeight: 20,
   },
 });

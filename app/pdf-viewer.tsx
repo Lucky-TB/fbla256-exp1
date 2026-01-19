@@ -52,10 +52,11 @@ export default function PDFViewerScreen() {
     ? `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`
     : url;
   
-  // Use desktop user agent for Instagram to enable post viewing
-  // Instagram's mobile site heavily restricts functionality
+  // Use desktop user agent for Instagram and X/Twitter to enable better viewing
+  // These platforms' mobile sites heavily restrict functionality or redirect to apps
   const isInstagram = url.includes('instagram.com');
-  const userAgent = isInstagram
+  const isTwitter = url.includes('x.com') || url.includes('twitter.com');
+  const userAgent = (isInstagram || isTwitter)
     ? 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     : undefined;
 
@@ -103,22 +104,31 @@ export default function PDFViewerScreen() {
           setLoading(false);
         }}
         onShouldStartLoadWithRequest={(request) => {
-          const { url } = request;
+          const { url: requestUrl } = request;
           
           // Block App Store URLs and other special schemes that can't be opened
           if (
-            url.includes('itms-appss://') ||
-            url.includes('itms://') ||
-            url.startsWith('itms-appss://') ||
-            url.startsWith('itms://')
+            requestUrl.includes('itms-appss://') ||
+            requestUrl.includes('itms://') ||
+            requestUrl.startsWith('itms-appss://') ||
+            requestUrl.startsWith('itms://')
           ) {
             // Try to open in external browser if it's an App Store link
-            if (url.includes('apps.apple.com')) {
-              Linking.openURL(url).catch(() => {
+            if (requestUrl.includes('apps.apple.com')) {
+              Linking.openURL(requestUrl).catch(() => {
                 // Silently fail if we can't open it
               });
             }
             return false; // Prevent WebView from trying to load it
+          }
+          
+          // For X/Twitter, prevent redirects to mobile app or external browser
+          // Keep navigation within WebView for x.com and twitter.com domains
+          if ((requestUrl.includes('x.com') || requestUrl.includes('twitter.com')) && 
+              !requestUrl.includes('itms://') && 
+              !requestUrl.includes('apps.apple.com')) {
+            // Allow navigation within X/Twitter domain
+            return true;
           }
           
           // Allow all other URLs to load normally
@@ -130,6 +140,21 @@ export default function PDFViewerScreen() {
         domStorageEnabled={true}
         allowsInlineMediaPlayback={true}
         mediaPlaybackRequiresUserAction={false}
+        // Additional properties to prevent redirects
+        sharedCookiesEnabled={true}
+        thirdPartyCookiesEnabled={true}
+        // Prevent automatic redirects for X/Twitter
+        onNavigationStateChange={(navState) => {
+          // If X/Twitter tries to redirect to app store or external, prevent it
+          if (isTwitter && (
+            navState.url.includes('itms://') ||
+            navState.url.includes('apps.apple.com') ||
+            navState.url.includes('twitter://')
+          )) {
+            // Stay on the current page
+            return;
+          }
+        }}
       />
     </SafeAreaView>
   );
