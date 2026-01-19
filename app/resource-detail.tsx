@@ -58,14 +58,18 @@ export default function ResourceDetailScreen() {
     try {
       switch (resource.resourceType) {
         case 'pdf':
-        case 'external_link':
+          // Open PDF in in-app WebView
           if (resource.url) {
-            const canOpen = await Linking.canOpenURL(resource.url);
-            if (canOpen) {
-              await Linking.openURL(resource.url);
-            } else {
-              Alert.alert('Error', 'Cannot open this URL');
-            }
+            router.push(`/pdf-viewer?url=${encodeURIComponent(resource.url)}&title=${encodeURIComponent(resource.title)}`);
+          } else {
+            Alert.alert('Error', 'PDF URL not available');
+          }
+          break;
+
+        case 'external_link':
+          // Open external links in in-app WebView
+          if (resource.url) {
+            router.push(`/pdf-viewer?url=${encodeURIComponent(resource.url)}&title=${encodeURIComponent(resource.title)}`);
           } else {
             Alert.alert('Error', 'Resource URL not available');
           }
@@ -221,20 +225,6 @@ export default function ResourceDetailScreen() {
           </View>
         )}
 
-        {/* URL (for external links and PDFs) */}
-        {(resource.resourceType === 'pdf' || resource.resourceType === 'external_link') &&
-          resource.url && (
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <FontAwesome name="link" size={18} color="#000000" />
-                <Text style={styles.sectionTitle}>URL</Text>
-              </View>
-              <Text style={styles.urlText} numberOfLines={2}>
-                {resource.url}
-              </Text>
-            </View>
-          )}
-
         {/* Action Button */}
         <View style={styles.section}>
           <TouchableOpacity
@@ -367,13 +357,6 @@ const styles = StyleSheet.create({
     color: '#374151',
     fontFamily: 'ApercuPro-Regular',
     lineHeight: 24,
-  },
-  urlText: {
-    fontSize: 14,
-    color: '#0A2E7F',
-    fontFamily: 'ApercuPro-Regular',
-    textDecorationLine: 'underline',
-    lineHeight: 20,
   },
   actionButton: {
     flexDirection: 'row',

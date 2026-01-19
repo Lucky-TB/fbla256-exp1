@@ -59,7 +59,11 @@ function RootLayoutNav() {
       <AuthProvider>
         <AccessibilityProvider>
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <Stack>
+            <Stack
+              screenOptions={{
+                animation: 'fade',
+              }}
+            >
             <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="auth-landing" options={{ headerShown: false }} />
             <Stack.Screen name="login" options={{ headerShown: false }} />
@@ -69,6 +73,7 @@ function RootLayoutNav() {
             <Stack.Screen name="accessibility-settings" options={{ headerShown: false }} />
             <Stack.Screen name="event-detail" options={{ headerShown: false }} />
             <Stack.Screen name="resource-detail" options={{ headerShown: false }} />
+            <Stack.Screen name="pdf-viewer" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
           </Stack>
