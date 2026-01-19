@@ -37,6 +37,11 @@ interface OnboardingData {
   grade: string;
   graduationYear: string;
   phoneNumber: string;
+  // Optional chapter social media handles
+  chapterInstagram: string;
+  chapterTwitter: string;
+  chapterTikTok: string;
+  chapterFacebook: string;
 }
 
 const GRADES = ['9th', '10th', '11th', '12th', 'Graduate'];
@@ -252,6 +257,97 @@ const Slide4 = React.memo<SlideProps>(({ data, errors, updateData }) => (
   </View>
 ));
 
+// Slide 5: Chapter Social Media (Optional)
+const Slide5 = React.memo<SlideProps>(({ data, errors, updateData }) => (
+  <View className="px-6 pt-8 flex-1">
+    <View className="mb-8">
+      <Text className="text-[#2D2B2B] text-2xl font-bold mb-2">
+        Chapter Social Media 📱
+      </Text>
+      <Text className="text-[#6B7280] text-base">
+        Help us connect your chapter's social media accounts (all optional).
+      </Text>
+    </View>
+
+    <View className="mb-4">
+      <Text className="text-[#2D2B2B] text-sm font-semibold mb-2">
+        Instagram <Text className="text-[#9CA3AF] font-normal">(Optional)</Text>
+      </Text>
+      <View className="flex-row items-center">
+        <Text className="text-[#6B7280] mr-2">@</Text>
+        <TextInput
+          className="bg-[#F9FAFB] rounded-xl px-4 py-4 text-[#2D2B2B] text-base border flex-1"
+          style={{ borderColor: '#E5E7EB', fontFamily: 'ApercuPro-Regular' }}
+          placeholder="username"
+          placeholderTextColor="#9CA3AF"
+          value={data.chapterInstagram}
+          onChangeText={(value) => updateData('chapterInstagram', value.replace('@', ''))}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+      </View>
+    </View>
+
+    <View className="mb-4">
+      <Text className="text-[#2D2B2B] text-sm font-semibold mb-2">
+        X (Twitter) <Text className="text-[#9CA3AF] font-normal">(Optional)</Text>
+      </Text>
+      <View className="flex-row items-center">
+        <Text className="text-[#6B7280] mr-2">@</Text>
+        <TextInput
+          className="bg-[#F9FAFB] rounded-xl px-4 py-4 text-[#2D2B2B] text-base border flex-1"
+          style={{ borderColor: '#E5E7EB', fontFamily: 'ApercuPro-Regular' }}
+          placeholder="username"
+          placeholderTextColor="#9CA3AF"
+          value={data.chapterTwitter}
+          onChangeText={(value) => updateData('chapterTwitter', value.replace('@', ''))}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+      </View>
+    </View>
+
+    <View className="mb-4">
+      <Text className="text-[#2D2B2B] text-sm font-semibold mb-2">
+        TikTok <Text className="text-[#9CA3AF] font-normal">(Optional)</Text>
+      </Text>
+      <View className="flex-row items-center">
+        <Text className="text-[#6B7280] mr-2">@</Text>
+        <TextInput
+          className="bg-[#F9FAFB] rounded-xl px-4 py-4 text-[#2D2B2B] text-base border flex-1"
+          style={{ borderColor: '#E5E7EB', fontFamily: 'ApercuPro-Regular' }}
+          placeholder="username"
+          placeholderTextColor="#9CA3AF"
+          value={data.chapterTikTok}
+          onChangeText={(value) => updateData('chapterTikTok', value.replace('@', ''))}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+      </View>
+    </View>
+
+    <View className="mb-6">
+      <Text className="text-[#2D2B2B] text-sm font-semibold mb-2">
+        Facebook <Text className="text-[#9CA3AF] font-normal">(Optional)</Text>
+      </Text>
+      <TextInput
+        className="bg-[#F9FAFB] rounded-xl px-4 py-4 text-[#2D2B2B] text-base border"
+        style={{ borderColor: '#E5E7EB', fontFamily: 'ApercuPro-Regular' }}
+        placeholder="Page URL or username"
+        placeholderTextColor="#9CA3AF"
+        value={data.chapterFacebook}
+        onChangeText={(value) => updateData('chapterFacebook', value)}
+        autoCapitalize="none"
+        autoCorrect={false}
+        keyboardType="url"
+      />
+      <Text className="text-[#9CA3AF] text-xs mt-1">
+        Enter your chapter's Facebook page URL or username.
+      </Text>
+    </View>
+  </View>
+));
+
 export default function OnboardingScreen() {
   const router = useRouter();
   const { user, signOut } = useAuth();
@@ -266,11 +362,15 @@ export default function OnboardingScreen() {
     grade: '',
     graduationYear: '',
     phoneNumber: '',
+    chapterInstagram: '',
+    chapterTwitter: '',
+    chapterTikTok: '',
+    chapterFacebook: '',
   });
 
   const [errors, setErrors] = useState<Partial<OnboardingData>>({});
 
-  const totalSlides = 4;
+  const totalSlides = 5;
 
   // Validation for each slide
   const validateSlide = (slideIndex: number): boolean => {
@@ -299,6 +399,9 @@ export default function OnboardingScreen() {
             newErrors.phoneNumber = 'Please enter a valid phone number (10-15 digits)';
           }
         }
+        break;
+      case 4: // Social Media
+        // All social media fields are optional, no validation needed
         break;
     }
 
@@ -339,6 +442,10 @@ export default function OnboardingScreen() {
         graduationYear: data.graduationYear,
         phoneNumber: data.phoneNumber.trim() || undefined,
         completedOnboarding: true,
+        chapterInstagram: data.chapterInstagram.trim() || undefined,
+        chapterTwitter: data.chapterTwitter.trim() || undefined,
+        chapterTikTok: data.chapterTikTok.trim() || undefined,
+        chapterFacebook: data.chapterFacebook.trim() || undefined,
       };
 
       // Verify user is authenticated before saving
@@ -464,6 +571,15 @@ export default function OnboardingScreen() {
             pointerEvents: currentSlide === 3 ? 'auto' : 'none'
           }}>
             <Slide4 data={data} errors={errors} updateData={updateData} />
+          </View>
+          <View style={{ 
+            position: 'absolute', 
+            width: '100%', 
+            height: '100%',
+            opacity: currentSlide === 4 ? 1 : 0,
+            pointerEvents: currentSlide === 4 ? 'auto' : 'none'
+          }}>
+            <Slide5 data={data} errors={errors} updateData={updateData} />
           </View>
         </View>
 

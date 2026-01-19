@@ -15,6 +15,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
@@ -50,6 +51,13 @@ export default function PDFViewerScreen() {
   const webUrl = isPdf && !isSupabaseStorage
     ? `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`
     : url;
+  
+  // Use desktop user agent for Instagram to enable post viewing
+  // Instagram's mobile site heavily restricts functionality
+  const isInstagram = url.includes('instagram.com');
+  const userAgent = isInstagram
+    ? 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    : undefined;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -76,17 +84,52 @@ export default function PDFViewerScreen() {
       <WebView
         source={{ uri: webUrl }}
         style={styles.webview}
+        userAgent={userAgent}
         onLoadStart={() => setLoading(true)}
         onLoadEnd={() => setLoading(false)}
         onError={(syntheticEvent) => {
           const { nativeEvent } = syntheticEvent;
+          // Suppress warnings for App Store URLs and other special schemes
+          const url = nativeEvent.url || '';
+          if (
+            url.includes('itms-appss://') ||
+            url.includes('itms://') ||
+            url.includes('apps.apple.com')
+          ) {
+            // Silently ignore App Store redirects
+            return;
+          }
           console.error('WebView error: ', nativeEvent);
           setLoading(false);
+        }}
+        onShouldStartLoadWithRequest={(request) => {
+          const { url } = request;
+          
+          // Block App Store URLs and other special schemes that can't be opened
+          if (
+            url.includes('itms-appss://') ||
+            url.includes('itms://') ||
+            url.startsWith('itms-appss://') ||
+            url.startsWith('itms://')
+          ) {
+            // Try to open in external browser if it's an App Store link
+            if (url.includes('apps.apple.com')) {
+              Linking.openURL(url).catch(() => {
+                // Silently fail if we can't open it
+              });
+            }
+            return false; // Prevent WebView from trying to load it
+          }
+          
+          // Allow all other URLs to load normally
+          return true;
         }}
         startInLoadingState={true}
         scalesPageToFit={true}
         javaScriptEnabled={true}
         domStorageEnabled={true}
+        allowsInlineMediaPlayback={true}
+        mediaPlaybackRequiresUserAction={false}
       />
     </SafeAreaView>
   );

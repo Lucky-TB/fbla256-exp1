@@ -23,6 +23,11 @@ export interface UserProfile {
   completedOnboarding: boolean;
   officerRole?: string;
   membershipStatus?: 'active' | 'inactive' | 'alumni';
+  // Optional chapter social media handles
+  chapterInstagram?: string;
+  chapterTwitter?: string;
+  chapterTikTok?: string;
+  chapterFacebook?: string;
 }
 
 export interface UserPreferences {
@@ -51,6 +56,10 @@ export interface SupabaseUserProfile {
   membership_status: 'active' | 'inactive' | 'alumni';
   completed_onboarding: boolean;
   preferences: UserPreferences;
+  chapter_instagram: string | null;
+  chapter_twitter: string | null;
+  chapter_tiktok: string | null;
+  chapter_facebook: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -107,6 +116,10 @@ export async function saveUserProfile(profile: UserProfile, userId: string): Pro
       officer_role: profile.officerRole || null,
       membership_status: profile.membershipStatus || 'active',
       completed_onboarding: profile.completedOnboarding,
+      chapter_instagram: profile.chapterInstagram || null,
+      chapter_twitter: profile.chapterTwitter || null,
+      chapter_tiktok: profile.chapterTikTok || null,
+      chapter_facebook: profile.chapterFacebook || null,
     };
 
     if (existing) {
@@ -194,6 +207,10 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
       completedOnboarding: data.completed_onboarding,
       officerRole: data.officer_role || undefined,
       membershipStatus: data.membership_status,
+      chapterInstagram: data.chapter_instagram || undefined,
+      chapterTwitter: data.chapter_twitter || undefined,
+      chapterTikTok: data.chapter_tiktok || undefined,
+      chapterFacebook: data.chapter_facebook || undefined,
     };
   } catch (error) {
     console.error('Error getting user profile:', error);
@@ -238,6 +255,10 @@ export async function getUserProfileWithPreferences(userId: string): Promise<{
       completedOnboarding: data.completed_onboarding,
       officerRole: data.officer_role || undefined,
       membershipStatus: data.membership_status,
+      chapterInstagram: data.chapter_instagram || undefined,
+      chapterTwitter: data.chapter_twitter || undefined,
+      chapterTikTok: data.chapter_tiktok || undefined,
+      chapterFacebook: data.chapter_facebook || undefined,
     };
 
     const preferences: UserPreferences = data.preferences || {
@@ -344,6 +365,10 @@ export async function updateProfileField(
       officerRole: 'officer_role',
       membershipStatus: 'membership_status',
       completedOnboarding: 'completed_onboarding',
+      chapterInstagram: 'chapter_instagram',
+      chapterTwitter: 'chapter_twitter',
+      chapterTikTok: 'chapter_tiktok',
+      chapterFacebook: 'chapter_facebook',
     };
 
     const dbField = fieldMap[field] || field;
@@ -358,5 +383,73 @@ export async function updateProfileField(
   } catch (error) {
     console.error('Error updating profile field:', error);
     throw error;
+  }
+}
+
+/**
+ * Get chapter social media handles
+ * Returns social media handles for a given chapter name
+ * First checks the current user's profile, then falls back to any user in the chapter
+ * Since chapters are stored as text, these handles represent chapter-level social media
+ */
+export async function getChapterSocialMedia(chapterName: string, userId?: string): Promise<{
+  instagram?: string;
+  twitter?: string;
+  tiktok?: string;
+  facebook?: string;
+} | null> {
+  try {
+    // First, try to get from current user's profile if userId is provided
+    if (userId) {
+      const { data: userData, error: userError } = await supabase
+        .from('user_profiles')
+        .select('chapter_instagram, chapter_twitter, chapter_tiktok, chapter_facebook')
+        .eq('user_id', userId)
+        .eq('chapter', chapterName)
+        .maybeSingle();
+
+      if (!userError && userData) {
+        const hasAnyHandle = userData.chapter_instagram || userData.chapter_twitter || 
+                            userData.chapter_tiktok || userData.chapter_facebook;
+        if (hasAnyHandle) {
+          return {
+            instagram: userData.chapter_instagram || undefined,
+            twitter: userData.chapter_twitter || undefined,
+            tiktok: userData.chapter_tiktok || undefined,
+            facebook: userData.chapter_facebook || undefined,
+          };
+        }
+      }
+    }
+
+    // Fallback: Get from any user in the chapter who has social media handles
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('chapter_instagram, chapter_twitter, chapter_tiktok, chapter_facebook')
+      .eq('chapter', chapterName)
+      .or('chapter_instagram.not.is.null,chapter_twitter.not.is.null,chapter_tiktok.not.is.null,chapter_facebook.not.is.null')
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error getting chapter social media:', error);
+      return null;
+    }
+
+    if (!data) return null;
+
+    // Return handles only if at least one exists
+    const hasAnyHandle = data.chapter_instagram || data.chapter_twitter || data.chapter_tiktok || data.chapter_facebook;
+    if (!hasAnyHandle) return null;
+
+    return {
+      instagram: data.chapter_instagram || undefined,
+      twitter: data.chapter_twitter || undefined,
+      tiktok: data.chapter_tiktok || undefined,
+      facebook: data.chapter_facebook || undefined,
+    };
+  } catch (error) {
+    console.error('Error getting chapter social media:', error);
+    return null;
   }
 }

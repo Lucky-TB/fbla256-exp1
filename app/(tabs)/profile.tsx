@@ -129,7 +129,7 @@ function ListItem({ icon, label, onPress, rightElement, showChevron = true, badg
 }
 
 export default function ProfileScreen() {
-  const { user, signOut } = useAuth();
+  const { user, role, signOut } = useAuth();
   const router = useRouter();
   const { colors, textSizeMultiplier } = useAccessibility();
   const [loading, setLoading] = useState(true);
@@ -314,6 +314,11 @@ export default function ProfileScreen() {
               {user?.email && (
                 <Text style={dynamicStyles.profileSubtext}>{user.email}</Text>
               )}
+              {role && (
+                <Text style={[dynamicStyles.profileSubtext, { marginTop: 4, textTransform: 'capitalize' }]}>
+                  {role}
+                </Text>
+              )}
             </View>
           </View>
         </View>
@@ -326,6 +331,11 @@ export default function ProfileScreen() {
               icon="user"
               label="Member Information"
               onPress={() => router.push('/member-info')}
+            />
+            <ListItem
+              icon="share-alt"
+              label="Chapter Social Media"
+              onPress={() => router.push('/chapter-social-media')}
             />
           </View>
         </View>
@@ -378,9 +388,7 @@ export default function ProfileScreen() {
             <ListItem
               icon="edit"
               label="Edit Profile"
-              onPress={() => {
-                Alert.alert('Edit Profile', 'Profile editing feature coming soon!');
-              }}
+              onPress={() => router.push('/edit-profile')}
             />
           </View>
         </View>
