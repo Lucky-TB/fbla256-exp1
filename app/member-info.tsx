@@ -99,16 +99,6 @@ export default function MemberInfoScreen() {
             </View>
           )}
 
-          {profile?.school && (
-            <View style={styles.infoRow}>
-              <View style={styles.infoLabelContainer}>
-                <FontAwesome name="building" size={20} color="#000000" style={styles.icon} />
-                <Text style={styles.infoLabel}>High School</Text>
-              </View>
-              <Text style={styles.infoValue}>{profile.school}</Text>
-            </View>
-          )}
-
           {profile?.phoneNumber && (
             <View style={styles.infoRow}>
               <View style={styles.infoLabelContainer}>

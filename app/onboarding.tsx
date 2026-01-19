@@ -32,7 +32,6 @@ import { useAuth } from '@/contexts/AuthContext';
 interface OnboardingData {
   firstName: string;
   lastName: string;
-  school: string;
   chapter: string;
   grade: string;
   graduationYear: string;
@@ -101,33 +100,16 @@ const Slide1 = React.memo<SlideProps>(({ data, errors, updateData }) => (
   </View>
 ));
 
-// Slide 2: School Info
+// Slide 2: Chapter Info
 const Slide2 = React.memo<SlideProps>(({ data, errors, updateData }) => (
   <View className="px-6 pt-8 flex-1">
     <View className="mb-8">
       <Text className="text-[#2D2B2B] text-2xl font-bold mb-2">
-        School Information 🏫
+        FBLA Chapter 🏫
       </Text>
       <Text className="text-[#6B7280] text-base">
-        Tell us about your school and FBLA chapter.
+        Tell us about your FBLA chapter.
       </Text>
-    </View>
-
-    <View className="mb-4">
-      <Text className="text-[#2D2B2B] text-sm font-semibold mb-2">School Name</Text>
-      <TextInput
-        className="bg-[#F9FAFB] rounded-xl px-4 py-4 text-[#2D2B2B] text-base border"
-        style={{ borderColor: errors.school ? '#DC2626' : '#E5E7EB', fontFamily: 'ApercuPro-Regular' }}
-        placeholder="e.g., Lincoln High School"
-        placeholderTextColor="#9CA3AF"
-        value={data.school}
-        onChangeText={(value) => updateData('school', value)}
-        autoCapitalize="words"
-        autoCorrect={false}
-      />
-      {errors.school && (
-        <Text className="text-[#DC2626] text-xs mt-1">{errors.school}</Text>
-      )}
     </View>
 
     <View className="mb-6">
@@ -357,7 +339,6 @@ export default function OnboardingScreen() {
   const [data, setData] = useState<OnboardingData>({
     firstName: '',
     lastName: '',
-    school: '',
     chapter: '',
     grade: '',
     graduationYear: '',
@@ -381,8 +362,7 @@ export default function OnboardingScreen() {
         if (!data.firstName.trim()) newErrors.firstName = 'First name is required';
         if (!data.lastName.trim()) newErrors.lastName = 'Last name is required';
         break;
-      case 1: // School Info
-        if (!data.school.trim()) newErrors.school = 'School name is required';
+      case 1: // Chapter Info
         if (!data.chapter.trim()) newErrors.chapter = 'Chapter name is required';
         break;
       case 2: // Academic Info
@@ -436,7 +416,6 @@ export default function OnboardingScreen() {
       const profile: UserProfile = {
         firstName: data.firstName.trim(),
         lastName: data.lastName.trim(),
-        school: data.school.trim(),
         chapter: data.chapter.trim(),
         grade: data.grade,
         graduationYear: data.graduationYear,

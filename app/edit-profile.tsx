@@ -41,7 +41,6 @@ export default function EditProfileScreen() {
   const [profile, setProfile] = useState<UserProfile>({
     firstName: '',
     lastName: '',
-    school: '',
     chapter: '',
     grade: '',
     graduationYear: '',
@@ -141,7 +140,6 @@ export default function EditProfileScreen() {
 
     if (!profile.firstName.trim()) newErrors.firstName = 'First name is required';
     if (!profile.lastName.trim()) newErrors.lastName = 'Last name is required';
-    if (!profile.school.trim()) newErrors.school = 'School name is required';
     if (!profile.chapter.trim()) newErrors.chapter = 'Chapter name is required';
     if (!profile.grade) newErrors.grade = 'Please select your grade';
     if (!profile.graduationYear) newErrors.graduationYear = 'Please select graduation year';
@@ -357,33 +355,14 @@ export default function EditProfileScreen() {
               </View>
             </View>
 
-            {/* School Info */}
+            {/* Chapter Info */}
             <View className="mb-6">
               <Text
                 className="text-[#2D2B2B] text-lg font-bold mb-4"
                 style={{ fontSize: 18 * textSizeMultiplier }}
               >
-                School Information
+                FBLA Chapter
               </Text>
-
-              <View className="mb-4">
-                <Text className="text-[#2D2B2B] text-sm font-semibold mb-2">School Name</Text>
-                <TextInput
-                  className="bg-[#F9FAFB] rounded-xl px-4 py-4 text-[#2D2B2B] text-base border"
-                  style={{
-                    borderColor: errors.school ? '#DC2626' : '#E5E7EB',
-                    fontFamily: 'ApercuPro-Regular',
-                  }}
-                  placeholder="e.g., Lincoln High School"
-                  placeholderTextColor="#9CA3AF"
-                  value={profile.school}
-                  onChangeText={(value) => updateField('school', value)}
-                  autoCapitalize="words"
-                />
-                {errors.school && (
-                  <Text className="text-[#DC2626] text-xs mt-1">{errors.school}</Text>
-                )}
-              </View>
 
               <View className="mb-4">
                 <Text className="text-[#2D2B2B] text-sm font-semibold mb-2">Chapter Name</Text>

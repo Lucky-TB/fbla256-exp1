@@ -209,7 +209,7 @@ export default function CommunityScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-white">
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#FBFBF9' }}>
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#0A2E7F" />
           <Text className="text-[#6B7280] mt-4" style={{ fontSize: 14 * textSizeMultiplier }}>
@@ -221,7 +221,7 @@ export default function CommunityScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#FBFBF9' }} edges={['top']}>
       <ScrollView
         className="flex-1"
         refreshControl={

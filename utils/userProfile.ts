@@ -15,7 +15,6 @@ import { supabase } from '@/lib/supabase';
 export interface UserProfile {
   firstName: string;
   lastName: string;
-  school: string;
   chapter: string;
   grade?: string;
   graduationYear?: string;
@@ -47,7 +46,6 @@ export interface SupabaseUserProfile {
   user_id: string;
   first_name: string;
   last_name: string;
-  school: string;
   chapter: string;
   grade: string | null;
   graduation_year: string | null;
@@ -108,7 +106,6 @@ export async function saveUserProfile(profile: UserProfile, userId: string): Pro
       user_id: userId,
       first_name: profile.firstName,
       last_name: profile.lastName,
-      school: profile.school,
       chapter: profile.chapter,
       grade: profile.grade || null,
       graduation_year: profile.graduationYear || null,
@@ -199,7 +196,6 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
     return {
       firstName: data.first_name,
       lastName: data.last_name,
-      school: data.school,
       chapter: data.chapter,
       grade: data.grade || undefined,
       graduationYear: data.graduation_year || undefined,
@@ -247,7 +243,6 @@ export async function getUserProfileWithPreferences(userId: string): Promise<{
     const profile: UserProfile = {
       firstName: data.first_name,
       lastName: data.last_name,
-      school: data.school,
       chapter: data.chapter,
       grade: data.grade || undefined,
       graduationYear: data.graduation_year || undefined,
