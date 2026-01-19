@@ -35,7 +35,13 @@ export function Text(props: TextProps) {
   const { style, lightColor, darkColor, className, ...otherProps } = props;
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
 
-  return <DefaultText className={className} style={[{ color }, style]} {...otherProps} />;
+  return (
+    <DefaultText
+      className={className}
+      style={[{ color, fontFamily: 'ApercuPro-Regular' }, style]}
+      {...otherProps}
+    />
+  );
 }
 
 export function View(props: ViewProps) {

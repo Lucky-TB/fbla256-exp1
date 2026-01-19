@@ -27,6 +27,7 @@ export default function TabLayout() {
         headerShown: false,
         tabBarLabelStyle: {
           marginTop: 5,
+          fontFamily: 'ApercuPro-Regular',
         },
         tabBarIconStyle: {
           marginTop: 5,

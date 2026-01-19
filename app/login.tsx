@@ -121,6 +121,7 @@ export default function LoginScreen() {
             <View className="mb-4">
               <TextInput
                 className="bg-[#F9FAFB] rounded-xl px-4 py-4 text-[#2D2B2B] text-base border border-[#E5E7EB]"
+                style={{ fontFamily: 'ApercuPro-Regular' }}
                 placeholder="Enter your email"
                 placeholderTextColor="#9CA3AF"
                 value={email}
@@ -136,6 +137,7 @@ export default function LoginScreen() {
               <View className="relative">
                 <TextInput
                   className="bg-[#F9FAFB] rounded-xl px-4 py-4 pr-12 text-[#2D2B2B] text-base border border-[#E5E7EB]"
+                  style={{ fontFamily: 'ApercuPro-Regular' }}
                   placeholder="Enter your password"
                   placeholderTextColor="#9CA3AF"
                   value={password}

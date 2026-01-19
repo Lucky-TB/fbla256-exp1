@@ -64,7 +64,7 @@ const Slide1 = React.memo<SlideProps>(({ data, errors, updateData }) => (
       <Text className="text-[#2D2B2B] text-sm font-semibold mb-2">First Name</Text>
       <TextInput
         className="bg-[#F9FAFB] rounded-xl px-4 py-4 text-[#2D2B2B] text-base border"
-        style={{ borderColor: errors.firstName ? '#DC2626' : '#E5E7EB' }}
+        style={{ borderColor: errors.firstName ? '#DC2626' : '#E5E7EB', fontFamily: 'ApercuPro-Regular' }}
         placeholder="Enter your first name"
         placeholderTextColor="#9CA3AF"
         value={data.firstName}
@@ -81,7 +81,7 @@ const Slide1 = React.memo<SlideProps>(({ data, errors, updateData }) => (
       <Text className="text-[#2D2B2B] text-sm font-semibold mb-2">Last Name</Text>
       <TextInput
         className="bg-[#F9FAFB] rounded-xl px-4 py-4 text-[#2D2B2B] text-base border"
-        style={{ borderColor: errors.lastName ? '#DC2626' : '#E5E7EB' }}
+        style={{ borderColor: errors.lastName ? '#DC2626' : '#E5E7EB', fontFamily: 'ApercuPro-Regular' }}
         placeholder="Enter your last name"
         placeholderTextColor="#9CA3AF"
         value={data.lastName}
@@ -112,7 +112,7 @@ const Slide2 = React.memo<SlideProps>(({ data, errors, updateData }) => (
       <Text className="text-[#2D2B2B] text-sm font-semibold mb-2">School Name</Text>
       <TextInput
         className="bg-[#F9FAFB] rounded-xl px-4 py-4 text-[#2D2B2B] text-base border"
-        style={{ borderColor: errors.school ? '#DC2626' : '#E5E7EB' }}
+        style={{ borderColor: errors.school ? '#DC2626' : '#E5E7EB', fontFamily: 'ApercuPro-Regular' }}
         placeholder="e.g., Lincoln High School"
         placeholderTextColor="#9CA3AF"
         value={data.school}
@@ -129,7 +129,7 @@ const Slide2 = React.memo<SlideProps>(({ data, errors, updateData }) => (
       <Text className="text-[#2D2B2B] text-sm font-semibold mb-2">Chapter Name</Text>
       <TextInput
         className="bg-[#F9FAFB] rounded-xl px-4 py-4 text-[#2D2B2B] text-base border"
-        style={{ borderColor: errors.chapter ? '#DC2626' : '#E5E7EB' }}
+        style={{ borderColor: errors.chapter ? '#DC2626' : '#E5E7EB', fontFamily: 'ApercuPro-Regular' }}
         placeholder="e.g., Lincoln High School FBLA"
         placeholderTextColor="#9CA3AF"
         value={data.chapter}
@@ -231,7 +231,8 @@ const Slide4 = React.memo<SlideProps>(({ data, errors, updateData }) => (
         Phone Number <Text className="text-[#9CA3AF] font-normal">(Optional)</Text>
       </Text>
       <TextInput
-        className="bg-[#F9FAFB] rounded-xl px-4 py-4 text-[#2D2B2B] text-base border border-[#E5E7EB]"
+          className="bg-[#F9FAFB] rounded-xl px-4 py-4 text-[#2D2B2B] text-base border"
+          style={{ borderColor: errors.phoneNumber ? '#DC2626' : '#E5E7EB', fontFamily: 'ApercuPro-Regular' }}
         placeholder="(555) 123-4567"
         placeholderTextColor="#9CA3AF"
         value={data.phoneNumber}
@@ -239,9 +240,14 @@ const Slide4 = React.memo<SlideProps>(({ data, errors, updateData }) => (
         keyboardType="phone-pad"
         autoCorrect={false}
       />
-      <Text className="text-[#9CA3AF] text-xs mt-1">
-        We'll use this to send you important updates about events and competitions.
-      </Text>
+      {errors.phoneNumber && (
+        <Text className="text-[#DC2626] text-xs mt-1">{errors.phoneNumber}</Text>
+      )}
+      {!errors.phoneNumber && (
+        <Text className="text-[#9CA3AF] text-xs mt-1">
+          We'll use this to send you important updates about events and competitions.
+        </Text>
+      )}
     </View>
   </View>
 ));
@@ -283,7 +289,16 @@ export default function OnboardingScreen() {
         if (!data.grade) newErrors.grade = 'Please select your grade';
         if (!data.graduationYear) newErrors.graduationYear = 'Please select graduation year';
         break;
-      case 3: // Additional Info (phone is optional, so no validation needed)
+      case 3: // Additional Info
+        // Phone number is optional, but if provided, validate format
+        if (data.phoneNumber.trim()) {
+          // Remove common formatting characters for validation
+          const cleaned = data.phoneNumber.replace(/[\s\-\(\)]/g, '');
+          // Check if it's all digits and has reasonable length (10-15 digits)
+          if (!/^\d+$/.test(cleaned) || cleaned.length < 10 || cleaned.length > 15) {
+            newErrors.phoneNumber = 'Please enter a valid phone number (10-15 digits)';
+          }
+        }
         break;
     }
 

@@ -6,7 +6,13 @@ module.exports = {
   ],
   presets: [require("nativewind/preset")],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['ApercuPro-Regular', 'system-ui', 'sans-serif'],
+        medium: ['ApercuPro-Medium', 'system-ui', 'sans-serif'],
+        bold: ['ApercuPro-Bold', 'system-ui', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 }
